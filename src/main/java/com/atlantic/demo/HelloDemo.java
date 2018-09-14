@@ -37,11 +37,14 @@ public class HelloDemo  extends HttpServlet {
         String url_a = request.getParameter("url");
 
         String url = cc.urlConverter(url_a);
+        log(url_a);
+
 
 
         //equest.get
         //  String eurl = URLEncoder.encode(url,"UTF-8");
         // String url= "https://biesseit.sharepoint.com/_api/web/GetFileByServerRelativeUrl%28%27/docportal/BIESSE_AMERICA/QUOTE/WOOD/2018/08/IWF%2018131-18_B/1/IWF18131-18_INTEGRITY%20CUSTOM%20CABINETS_ROVER%20B%20FT%201536.pdf%27%29/$value";
+       // String url = "https%3A%2F%2Fbiesseit.sharepoint.com%2F_api%2Fweb%2FGetFileByServerRelativeUrl%28%26%2339%3B%2Fdocportal%2FBIESSE_AMER%0AICA%2FQUOTE%2FWOOD%2F2018%2F08%2FIWF%2018131-18_B%2F1%2FIWF18131-18_INTEGRITY%20CUSTOM%0ACABINETS_ROVER%20B%20FT%201536.pdf%26%2339%3B%29%2F%24value";
         OkHttpClient client = new OkHttpClient();
         Request req = new Request.Builder().url(url)
                 .get()
@@ -52,22 +55,9 @@ public class HelloDemo  extends HttpServlet {
                 throw new IOException("Unexpected code " + res + " response:" + res);
             }
             String filename = null;
-            String contentDisposition = res.header("Content-Disposition");
-            if (contentDisposition != null && !"".equals(contentDisposition)) {
-                // Get filename from the Content-Disposition header.
-                Pattern pattern = Pattern.compile("filename=['\"]?([^'\"\\s]+)['\"]?");
-                Matcher matcher = pattern.matcher(contentDisposition);
-                if (matcher.find()) {
-                    filename = (matcher.group(1));
-                }
-            }
-            //  InputStream in = res.body().byteStream();
-            //BufferedSource source = res.body().source();
-
-            // Sink out = Okio.sink("pp.pdf");
-
+            filename= cc.getFilename();
             response.setContentType("application/octet-stream");
-            response.addHeader("Content-Disposition", "attachment; filename=" + filename);
+            response.addHeader("Content-Disposition", "attachment; filename="+filename);
 
             OutputStream out = response.getOutputStream();
             byte[] buffer = new byte[4096];

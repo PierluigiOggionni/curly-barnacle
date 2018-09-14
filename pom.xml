@@ -49,6 +49,13 @@
       <artifactId>commons-codec</artifactId>
       <version>1.11</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-io -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>RELEASE</version>
+    </dependency>
+
 
 
   </dependencies>

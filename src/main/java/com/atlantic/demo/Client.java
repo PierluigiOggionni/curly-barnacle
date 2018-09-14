@@ -4,16 +4,15 @@ import java.io.*;
 
 import okhttp3.*;
 
-import java.net.URLDecoder;
+import java.net.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.io.FilenameUtils;
 import org.json.*;
 import sun.misc.BASE64Decoder;
 
@@ -27,6 +26,16 @@ import org.apache.commons.codec.binary.StringUtils;
 public class Client {
     private String accessToken;
     private static HashMap<String, String> urlParameters = new HashMap<>();
+    private String filename;
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+
 
 
     public Client() {
@@ -113,15 +122,17 @@ public class Client {
         return Base64.encodeBase64String(StringUtils.getBytesUtf8(s));
     }
 
-    public String urlConverter(String url) throws UnsupportedEncodingException {
+    public String urlConverter(String url) throws UnsupportedEncodingException, MalformedURLException {
         //String tmpString = "https://biesseit.sharepoint.com/docportal/SitePages/downloader.aspx?file=";
 
         String  base64String = url.replace("https://biesseit.sharepoint.com/docportal/SitePages/downloader.aspx?file=","");
         String  base64Decode= this.decode(base64String);
+        URL  url_a =new URL(base64Decode);
+        this.filename = FilenameUtils.getName(url_a.getPath());
         String removeHttp= base64Decode.replace("https://biesseit.sharepoint.com","");
-        String finalString = "https://biesseit.sharepoint.com/_api/web/GetFileByServerRelativeUrl('"+removeHttp+"')/$value";
+        String finalString = "https://biesseit.sharepoint.com/_api/web/GetFileByServerRelativeUrl('"+ removeHttp+"')/$value";
 
-        return URLEncoder.encode(finalString,"UTF-8");
+        return(finalString);
 
 
     }
