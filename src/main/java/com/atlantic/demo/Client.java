@@ -128,7 +128,7 @@ public class Client {
         String  base64String = url.replace("https://biesseit.sharepoint.com/docportal/SitePages/downloader.aspx?file=","");
         String  base64Decode= this.decode(base64String);
         URL  url_a =new URL(base64Decode);
-        this.filename = FilenameUtils.getName(url_a.getPath());
+        this.filename = FilenameUtils.getName(url_a.getPath()).replaceAll("[^a-zA-Z0-9.-]", "_");
         String removeHttp= base64Decode.replace("https://biesseit.sharepoint.com","");
         String finalString = "https://biesseit.sharepoint.com/_api/web/GetFileByServerRelativeUrl('"+ removeHttp+"')/$value";
 
