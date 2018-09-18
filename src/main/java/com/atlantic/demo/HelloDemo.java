@@ -52,7 +52,7 @@ public class HelloDemo  extends HttpServlet {
                 .build();
         try (Response res = client.newCall(req).execute()) {
             if (!res.isSuccessful()) {
-                throw new IOException("Unexpected code " + res + " response:" + res);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
             String filename = null;
             filename= cc.getFilename();
@@ -61,7 +61,11 @@ public class HelloDemo  extends HttpServlet {
 
             OutputStream out = response.getOutputStream();
             byte[] buffer = new byte[4096];
+
             InputStream in = res.body().byteStream();
+            if (in == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
             int read;
 
             while ((read = in.read(buffer)) != -1) {
