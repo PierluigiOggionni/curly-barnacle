@@ -4,4 +4,14 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+  <servlet>
+    <servlet-name>PdfDownloadServlet</servlet-name>
+    <servlet-class>com.atlantic.demo.HelloDemo</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>PdfDownloadServlet</servlet-name>
+    <url-pattern>/pdfdownload</url-pattern>
+  </servlet-mapping>
+
 </web-app>

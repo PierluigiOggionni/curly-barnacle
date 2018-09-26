@@ -2,13 +2,11 @@ package com.atlantic.demo;
 
 import java.io.*;
 
-import okhttp3.*;
+//import okhttp3.*;
 
 import java.net.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.nio.charset.StandardCharsets;
+import java.util.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,12 +18,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.StringUtils;
+import javax.crypto.Cipher;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 
 
 
 public class Client {
     private String accessToken;
-    private static HashMap<String, String> urlParameters = new HashMap<>();
+    private static HashMap<String, String> urlParameters = new HashMap<String,String>();
     private String filename;
     public String getFilename() {
         return filename;
@@ -71,9 +74,29 @@ public class Client {
     }
 
 
+
+
     public String retrieveAccessToken() throws IOException {
-        OkHttpClient client = new OkHttpClient();
-        String parameters= getDataString(urlParameters);
+       //  OkHttpClient client = new OkHttpClient();
+        URL url = new URL("https://accounts.accesscontrol.windows.net/29f69b92-a6f3-4bdc-a7df-7a5ed4afbfe0/tokens/OAuth/2");
+        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+        Map<String,Object> params = new LinkedHashMap<String, Object>();
+        params.put("grant_type", "client_credentials");
+        params.put("client_id", "3f990da5-d8ac-46eb-a2b1-ab822ef504ce@29f69b92-a6f3-4bdc-a7df-7a5ed4afbfe0");
+        params.put("client_secret", "4xMpwigIfn4uqHbGcDoLE6Y3lBtN0/54vli5m4ULVBc=");
+        params.put("resource", "00000003-0000-0ff1-ce00-000000000000/biesseit.sharepoint.com@29f69b92-a6f3-4bdc-a7df-7a5ed4afbfe0");
+        StringBuilder postData = new StringBuilder();
+        for (Map.Entry<String,Object> param : params.entrySet()) {
+            if (postData.length() != 0) postData.append('&');
+            postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+            postData.append('=');
+            postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+        }
+        byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+      //        params.put("query", "adewewewe");
+
+        //String parameters= getDataString(urlParameters);
+        /*
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody body =
                 RequestBody.create(mediaType, parameters);
@@ -84,8 +107,19 @@ public class Client {
 
         Response response = client.newCall(request).execute();
        // System.out.println(response.body().string());
-
-        String jsonData = response.body().string();
+        */
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+       // conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+        conn.setDoOutput(true);
+        conn.getOutputStream().write(postDataBytes);
+        Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+        StringBuilder data = new StringBuilder();
+        for (int c; (c = in.read()) >= 0;) {
+            data.append((char)c);
+        }
+        String jsonData = data.toString();
+       // String jsonData = response.body().string();
         JSONObject jsonObject= new JSONObject(jsonData);
         this.accessToken = jsonObject.getString("access_token");
 
@@ -96,7 +130,7 @@ public class Client {
         return jsonObject.getString("access_token");
     }
 
-    public String getSharepointDoc(String url) throws IOException  {
+    /*public String getSharepointDoc(String url) throws IOException  {
        // String token = accessToken;
         String eurl = URLEncoder.encode(url,"UTF-8");
 
@@ -105,7 +139,8 @@ public class Client {
                 .get()
                 .addHeader("Authorization", "Bearer "+retrieveAccessToken())
                 .build();
-        try (Response response = client.newCall(request).execute()) {
+        try  {
+            Response response = client.newCall(request).execute();
             if (!response.isSuccessful()){
                 throw new IOException("Unexpected code " + request +" response:"+ response);
             }
@@ -114,7 +149,10 @@ public class Client {
             return response.body().toString();
 
         }
+
+
     }
+    */
     public String decode(String s) {
         return StringUtils.newStringUtf8(Base64.decodeBase64(s));
     }
